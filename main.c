@@ -6,7 +6,8 @@
 
 
 char * commandHandler();
-int validCommand(char *input, char *command);
+int isCommand(char *input, char *command);
+void helpCommand();
 void first();
 
 int main(){
@@ -14,26 +15,27 @@ int main(){
     input = (char*) malloc(sizeof(char)* MAXINPUT);
     while(1) {
         command = commandHandler(input);
-        if (validCommand(command,"add")) {
-            first(input);
-        } else if (validCommand(command,"help")) {
-            printf("hello\n"); 
-        } else if (validCommand(command,"set")) {
-            printf("hello\n");
-        } else if (validCommand(command,"print")) {
-            printf("hello\n");
-        } else if (validCommand(command,"find")) {
-            printf("hello\n");
-        } else if (validCommand(command,"list")) {
-            printf("hello\n");
-        } else if (validCommand(command,"search")) {
-            printf("hello\n");
-        }else if (validCommand(command,"delete")) {
-            printf("hello\n");
-        } else if (validCommand(command,"quit")) {
+        if (isCommand(command,"add")) first(input);
+
+        else if (isCommand(command,"help")) helpCommand();
+
+        else if (isCommand(command,"set")) printf("hello\n");
+
+        else if (isCommand(command,"print")) printf("hello\n");
+
+        else if (isCommand(command,"find")) printf("hello\n");
+
+        else if (isCommand(command,"list")) printf("hello\n");
+
+        else if (isCommand(command,"search")) printf("hello\n");
+
+        else if (isCommand(command,"delete")) printf("hello\n");
+        
+        else if (isCommand(command,"quit")) {
             free(input);
             exit(0);
         }
+        else printf("ups!\n");
     }
 }
 
@@ -48,7 +50,7 @@ char * commandHandler(char * input){
     return input;
 }
 
-int validCommand(char *input, char *command){
+int isCommand(char *input, char *command){
     return (strcmp(input, command) == 0);
 }
 
@@ -61,4 +63,15 @@ void first(char * input){
     }
     input[i] = '\0';
     printf("%s\n", input);
+}
+
+void helpCommand(){
+    puts("help: Imprime os comandos disponíveis.");
+    puts("quit: Termina o programa.");
+    puts("set: Adiciona ou modifica o valor a armazenar.");
+    puts("print: Imprime todos os caminhos e valores.");
+    puts("find: Imprime o valor armazenado.");
+    puts("list: Lista todos os componentes imediatos de um sub-caminho.");
+    puts("search: Procura o caminho dado um valor.");
+    puts("delete: Apaga um caminho e todos os subcaminhos.");
 }
