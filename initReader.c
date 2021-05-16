@@ -1,6 +1,3 @@
-#include "initReader.h"
-
-
 char * commandHandler(){
     int i = 0;
     char c;
