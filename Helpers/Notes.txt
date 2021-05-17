@@ -17,6 +17,16 @@ set <caminho> <valor>
 
 
 ---------------------
+SEARCH:
+search <valor>
+---------------------
+
+-Adicionar / ao inicio e separar tudo por um espaço
+-Pesquisado pela sua ordem de criação
+-Retorna o PATH
+
+
+---------------------
 PRINT:
 ---------------------
 
@@ -38,16 +48,6 @@ list <caminho>
 ---------------------
 
 -Lista todos os elementos em ordem alfabética
-
-
----------------------
-SEARCH:
-search <valor>
----------------------
-
--Adicionar / ao inicio e separar tudo por um espaço
--Pesquisado pela sua ordem de criação
--Retorna o PATH
 
 
 ---------------------

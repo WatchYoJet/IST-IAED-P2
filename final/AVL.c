@@ -5,7 +5,6 @@
 
 int mallocCounter = 0;
 
-
 struct Node{
     char key[MAXINPUT];
     char valor[MAXINPUT];
@@ -14,6 +13,13 @@ struct Node{
     struct Node *right;
     int height;
 };
+
+struct Tree{
+    char path[MAXINPUT];
+    struct Tree *next;
+    struct Node *Node;
+};
+
 
 int max(int a, int b);
 
@@ -36,7 +42,7 @@ struct Node * newNode(char key[]){
     node->left   = NULL;
     node->right  = NULL;
     node->height = 1;  
-    return(node);
+    return node;
 }
 
 struct Node * rightRotate(struct Node *y){
@@ -178,17 +184,24 @@ void finnish(struct Node *root){
     }
 }
 
-int main(){
-    struct Node *root = NULL;
+void test(struct Tree* root){
+    root->Node = insert(root->Node, "works!");
+}
 
-    root = insert(root, "um");
-    root = insert(root, "dois");
-    root = insert(root, "quatro");
-    root = insert(root, "cinco");
-    root = insert(root, "tres");   
-    printf("ROOT:\n");
-    preOrder(root);
-    printf("\nOLA:\n");
+int main(){
+    struct Tree *root = (struct Tree*)malloc(sizeof(struct Tree));
+
+    strcpy(root->path, "oknice");
+    root->next = NULL;
+    root->Node = NULL;
+    puts("wut");
+    test(root);
+    preOrder(root->Node);
+    puts("\nwut2");
+    root->next = (struct Tree*)malloc(sizeof(struct Tree));
+    root->next->Node = insert(root->next->Node, "works2!");
+    preOrder(root->next->Node);
+    puts("\nwut3");
 
     printf("\n\n----------------\nmallocCounter: %d\n", mallocCounter);
     return 0;
