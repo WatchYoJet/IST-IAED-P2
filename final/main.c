@@ -3,7 +3,7 @@
 #include <string.h>
 /* #include "initReader.h" */
 #define MAXINPUT 65523
-#define MAX_COMMAND_SIZE 6
+#define MAX_COMMAND_SIZE 7
 struct Node{
     char key[MAXINPUT];
     char valor[MAXINPUT];
@@ -166,12 +166,7 @@ int main(){
 
         if (isCommand(command,"help")) helpCommand();
 
-        else if (isCommand(command,"set")){
-            root = setCommmand(path, value, root);
-            puts("---------");
-            printing(root);
-            puts("---------");
-        } 
+        else if (isCommand(command,"set"))root = setCommmand(path, value, root); 
 
         else if (isCommand(command,"print")) printf("hello\n");
 
@@ -179,7 +174,7 @@ int main(){
 
         else if (isCommand(command,"list")) printf("hello\n");
 
-        else if (isCommand(command,"search")) searchCommand(value,root);
+        else if (isCommand(command,"search")) searchCommand(arguments,root);
 
         else if (isCommand(command,"delete")) printf("hello\n");
         
@@ -256,7 +251,7 @@ struct Tree* setCommmand(char path[], char value[], struct Tree *root){
     struct Tree *temp, *temp2;
     int val = 1;
 
-    root = checkRootTree(root);
+    if(root == NULL) root = checkRootTree(root);
     temp = root;
 
     token = strtok(path, "/");
@@ -278,9 +273,6 @@ struct Tree* setCommmand(char path[], char value[], struct Tree *root){
         if (temp == NULL) temp = temp2;
         temp->Node = insert(temp->Node, token);
         if (token2 != NULL) temp->Node = insert(temp->Node, token2);
-        printf("PRE ORDER: %s\n->", temp->path);
-        preOrder(temp->Node);
-        printf("\n");
         temp = temp2;
         if (token2 != NULL && val){
             temp->next = checkRootTree(temp->next);
@@ -309,8 +301,10 @@ struct Tree* pathExists(struct Tree *root, char path[]){
 
 void searchCommand(char value[], struct Tree *root){
     while (root != NULL){
-        if (!strcmp(root->Node->valor, value))
+        if (!strcmp(root->Node->valor, value)){
             puts(root->path);
+            break;
+        }
         root = root->next;
     }
 }
