@@ -285,17 +285,11 @@ void printing(struct Tree *root){
     }
 }
 
-
-/* set ola/tudobem?/hmmhereitgoes/works!/Ithinkso WORKS!! */
-struct Tree* setCommmand(char path[], char value[], struct Tree *root){
-    char *token, pathHandler[MAXINPUT] = "/", *token2;
-    struct Tree *temp, *temp2;
-
-    root = checkRootTree(root);
-    temp = root;
-    token = value;
-    token = strtok(path, "/");
-    while(temp != NULL && temp != root){
+struct Tree* nextNull(struct Tree *root){
+    struct Tree *temp = root;
+    if (root->next == NULL) return root;
+    if (temp->path == NULL) puts("fuck");
+    while(temp != NULL){
         if(temp->next == NULL){
             temp->next = checkRootTree(temp->next);
             temp = temp->next;
@@ -303,24 +297,49 @@ struct Tree* setCommmand(char path[], char value[], struct Tree *root){
         }
         temp = temp->next;
     }
-    while( token != NULL ) {
+    return temp;
+}
+
+/* set ola/tudobem?/hmmhereitgoes/works!/Ithinkso WORKS!! */
+struct Tree* setCommmand(char path[], char value[], struct Tree *root){
+    char *token, pathHandler[MAXINPUT] = "/", *token2;
+    struct Tree *temp, *temp2;
+    int val = 1;
+
+    root = checkRootTree(root);
+    temp = root;
+    token = strtok(path, "/");
+    if (pathExists(root,path) != NULL){
+        temp = pathExists(root,path);
+        strcpy(temp->Node->valor, value);
+        return root;
+    }
+    temp = nextNull(root);
+    while( token != NULL ) { 
+        /* TODO- arranjar o nome dos paths e meter isto numa so funçao*/
         token2 = strtok(NULL, "/");
         strcat(pathHandler, token);
-        if (token2 != NULL) strcat(pathHandler, "/");
-        strcpy(temp->path,pathHandler);
+        strcat(pathHandler, "/");
+        if(pathExists(root, pathHandler) == NULL)strcpy(temp->path,pathHandler);
         temp2 = temp;
         temp = pathExists(root, pathHandler);
+        if (temp != temp2) val = 0;
+        if (temp == NULL) temp = temp2;
         temp->Node = insert(temp->Node, token);
+        if (token2 != NULL) temp->Node = insert(temp->Node, token2);
+        printf("PRE ORDER: %s\n->", temp->path);
         preOrder(temp->Node);
         printf("\n");
         temp = temp2;
-        if (token2 != NULL){
+        if (token2 != NULL && val){
             temp->next = checkRootTree(temp->next);
             temp = temp->next;
         }
         token = token2;
     }
+    temp = pathExists(root, pathHandler);
     strcpy(temp->Node->valor, value);
+    puts("fuck!");
     return root;
 }
 
@@ -331,7 +350,7 @@ se sim, adiciona a esse mesmo*/
 struct Tree* pathExists(struct Tree *root, char path[]){
     struct Tree *temp;
     for (temp = root; temp != NULL; temp = temp->next){
-        if(!strcmp(temp->path,path)){
+        if(strcmp(temp->path,path) == 0){
             return temp;
         }
     }
