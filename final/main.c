@@ -24,7 +24,7 @@ void quitCommand();
 struct Tree* setCommmand(char path[], char value[], struct Tree *root);
 struct Tree* pathExists(struct Tree *root, char path[]);
 void printing(struct Tree *root);
-void searchCommand(struct Tree *root);
+void searchCommand(char value[], struct Tree *root);
 
 int mallocCounter = 0;
 
@@ -122,58 +122,6 @@ struct Node * minValueNode(struct Node* node){
     return current;
 }
 
-struct Node * deleteNode(struct Node * root, char key[]){
-    if (root == NULL)
-        return root;
-
-    if (strcmp(key, root->key) < 0)
-        root->left = deleteNode(root->left, key);
-
-    else if(strcmp(key, root->key) > 0)
-        root->right = deleteNode(root->right, key);
-
-    else{
-        if( (root->left == NULL) || (root->right == NULL) ){
-            struct Node *temp = root->left ? root->left : root->right;
-            if (temp == NULL){
-                temp = root;
-                root = NULL;
-            }
-            else *root = *temp; 
-            free(temp);
-            --mallocCounter;
-        }
-        else{
-            struct Node* temp = minValueNode(root->right);
-            strcpy(root->key, temp->key);
-            root->right = deleteNode(root->right, temp->key);
-        }
-    }
-
-    if (root == NULL)
-        return root;
-
-    root->height = 1 + max(height(root->left), height(root->right));
-
-    if (getBalance(root) > 1 && getBalance(root->left) >= 0)
-        return rightRotate(root);
-
-    if (getBalance(root) > 1 && getBalance(root->left) < 0){
-        root->left =  leftRotate(root->left);
-        return rightRotate(root);
-    }
-
-    if (getBalance(root) < -1 && getBalance(root->right) <= 0)
-        return leftRotate(root);
-
-    if (getBalance(root) < -1 && getBalance(root->right) > 0){
-        root->right = rightRotate(root->right);
-        return leftRotate(root);
-    }
-
-    return root;
-}
-
 void preOrder(struct Node *root){
     if(root != NULL){
         preOrder(root->left);
@@ -207,20 +155,6 @@ void finnish(struct Node *root){
     return 0;
 }*/
 
-void searchCommand(char value[],struct Tree *root){
-    struct Tree *temp;
-    for(temp = root; temp != NULL; temp = temp->next){
-        puts("fuck");
-        printf("%s\n", root->path);
-        printf("%s\n", temp->Node->valor);
-        if (!strcmp(temp->Node->valor,value)){
-            printf("%s\n", temp->path);
-            break;
-        }
-    }
-    puts("fuck2");
-}
-
 int main(){
     char command[MAX_COMMAND_SIZE],input[MAXINPUT];
     char path[MAXINPUT], value[MAXINPUT], arguments[MAXINPUT- MAX_COMMAND_SIZE];
@@ -245,7 +179,7 @@ int main(){
 
         else if (isCommand(command,"list")) printf("hello\n");
 
-        else if (isCommand(command,"search")) printing(root);
+        else if (isCommand(command,"search")) searchCommand(value,root);
 
         else if (isCommand(command,"delete")) printf("hello\n");
         
@@ -324,6 +258,7 @@ struct Tree* setCommmand(char path[], char value[], struct Tree *root){
 
     root = checkRootTree(root);
     temp = root;
+
     token = strtok(path, "/");
     if (pathExists(root,path) != NULL){
         temp = pathExists(root,path);
@@ -370,10 +305,12 @@ struct Tree* pathExists(struct Tree *root, char path[]){
     }
     return NULL;
 }
- 
-void searchCommand(struct Tree *root){
+
+
+void searchCommand(char value[], struct Tree *root){
     while (root != NULL){
-        printf("%s\n", root->path);
+        if (!strcmp(root->Node->valor, value))
+            puts(root->path);
         root = root->next;
     }
 }
