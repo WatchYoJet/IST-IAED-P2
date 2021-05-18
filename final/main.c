@@ -24,6 +24,7 @@ void quitCommand();
 struct Tree* setCommmand(char path[], char value[], struct Tree *root);
 struct Tree* pathExists(struct Tree *root, char path[]);
 void printing(struct Tree *root);
+void searchCommand(struct Tree *root);
 
 int mallocCounter = 0;
 
@@ -206,6 +207,20 @@ void finnish(struct Node *root){
     return 0;
 }*/
 
+void searchCommand(char value[],struct Tree *root){
+    struct Tree *temp;
+    for(temp = root; temp != NULL; temp = temp->next){
+        puts("fuck");
+        printf("%s\n", root->path);
+        printf("%s\n", temp->Node->valor);
+        if (!strcmp(temp->Node->valor,value)){
+            printf("%s\n", temp->path);
+            break;
+        }
+    }
+    puts("fuck2");
+}
+
 int main(){
     char command[MAX_COMMAND_SIZE],input[MAXINPUT];
     char path[MAXINPUT], value[MAXINPUT], arguments[MAXINPUT- MAX_COMMAND_SIZE];
@@ -230,7 +245,7 @@ int main(){
 
         else if (isCommand(command,"list")) printf("hello\n");
 
-        else if (isCommand(command,"search")) printf("hello\n");
+        else if (isCommand(command,"search")) printing(root);
 
         else if (isCommand(command,"delete")) printf("hello\n");
         
@@ -300,6 +315,7 @@ struct Tree* nextNull(struct Tree *root){
     return temp;
 }
 
+
 /* set ola/tudobem?/hmmhereitgoes/works!/Ithinkso WORKS!! */
 struct Tree* setCommmand(char path[], char value[], struct Tree *root){
     char *token, pathHandler[MAXINPUT] = "/", *token2;
@@ -337,9 +353,7 @@ struct Tree* setCommmand(char path[], char value[], struct Tree *root){
         }
         token = token2;
     }
-    temp = pathExists(root, pathHandler);
     strcpy(temp->Node->valor, value);
-    puts("fuck!");
     return root;
 }
 
@@ -355,4 +369,11 @@ struct Tree* pathExists(struct Tree *root, char path[]){
         }
     }
     return NULL;
+}
+ 
+void searchCommand(struct Tree *root){
+    while (root != NULL){
+        printf("%s\n", root->path);
+        root = root->next;
+    }
 }
