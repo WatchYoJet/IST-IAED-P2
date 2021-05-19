@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 /* #include "initReader.h" */
-#define MAXINPUT 65523
+#define MAXINPUT 65524
 #define MAX_COMMAND_SIZE 7
 struct Node{
     char key[MAXINPUT];
@@ -25,6 +25,8 @@ struct Tree* setCommmand(char path[], char value[], struct Tree *root);
 struct Tree* pathExists(struct Tree *root, char path[]);
 void printing(struct Tree *root);
 void searchCommand(char value[], struct Tree *root);
+void printCommand(struct Tree *root);
+void listCommand(struct Tree *root, char path[]);
 
 int mallocCounter = 0;
 
@@ -125,7 +127,7 @@ struct Node * minValueNode(struct Node* node){
 void preOrder(struct Node *root){
     if(root != NULL){
         preOrder(root->left);
-        printf("%s ", root->key);
+        puts(root->key);
         preOrder(root->right);
     }
 }
@@ -168,11 +170,11 @@ int main(){
 
         else if (isCommand(command,"set"))root = setCommmand(path, value, root); 
 
-        else if (isCommand(command,"print")) printf("hello\n");
+        else if (isCommand(command,"print")) printCommand(root);
 
         else if (isCommand(command,"find")) printf("hello\n");
 
-        else if (isCommand(command,"list")) printf("hello\n");
+        else if (isCommand(command,"list")) listCommand(root, arguments);
 
         else if (isCommand(command,"search")) searchCommand(arguments,root);
 
@@ -247,7 +249,7 @@ struct Tree* nextNull(struct Tree *root){
 
 /* set ola/tudobem?/hmmhereitgoes/works!/Ithinkso WORKS!! */
 struct Tree* setCommmand(char path[], char value[], struct Tree *root){
-    char *token, pathHandler[MAXINPUT] = "/", *token2;
+    char *token, pathHandler[MAXINPUT]="/", *token2;
     struct Tree *temp, *temp2;
     int val = 1;
 
@@ -265,14 +267,16 @@ struct Tree* setCommmand(char path[], char value[], struct Tree *root){
         /* TODO- arranjar o nome dos paths e meter isto numa so funçao*/
         token2 = strtok(NULL, "/");
         strcat(pathHandler, token);
-        strcat(pathHandler, "/");
         if(pathExists(root, pathHandler) == NULL)strcpy(temp->path,pathHandler);
         temp2 = temp;
         temp = pathExists(root, pathHandler);
         if (temp != temp2) val = 0;
         if (temp == NULL) temp = temp2;
         temp->Node = insert(temp->Node, token);
-        if (token2 != NULL) temp->Node = insert(temp->Node, token2);
+        if (token2 != NULL){
+            temp->Node = insert(temp->Node, token2);
+            strcat(pathHandler, "/");
+        }
         temp = temp2;
         if (token2 != NULL && val){
             temp->next = checkRootTree(temp->next);
@@ -305,6 +309,31 @@ void searchCommand(char value[], struct Tree *root){
             puts(root->path);
             break;
         }
+        root = root->next;
+    }
+}
+
+void printCommand(struct Tree *root){
+    while (root != NULL){
+        if (root->Node->valor != NULL){
+            puts(root->path);
+        }
+        root = root->next;
+    }
+}
+
+void listCommand(struct Tree *root, char path[]){
+    char *token, pathHandler[MAXINPUT]="/";
+
+    token = strtok(path, "/");
+    while( token != NULL ) {
+        strcat(pathHandler, token);
+        token = strtok(NULL, "/");
+        if (token != NULL) strcat(pathHandler, "/");
+    }
+
+    while (root != NULL){
+        if (!strcmp(root->path, pathHandler)) preOrder(root->Node);
         root = root->next;
     }
 }

@@ -7,7 +7,24 @@ Depois uma Linked List para ter a ordem de criação.
 Adicionas um TreeMap "global" para ir de valores
 para LinkedList de paths, para o search.
 
+---------------------
+DELETE:
+delete <caminho>
+---------------------
 
+-Apaga um determinado caminho.
+-Lembrar de apagar os "dependentes" desse mesmo.
+
+
+---------------------
+FIND:
+find <caminho>
+---------------------
+
+-valor do <caminho>
+
+
+-------------------------------------DONE---------------------------------------
 ---------------------
 SET: 
 set <caminho> <valor>
@@ -34,12 +51,6 @@ PRINT:
 -Ordem de criação e em profundidade
 
 
----------------------
-FIND:
-find <caminho>
----------------------
-
--valor do <caminho>
 
 
 ---------------------
@@ -48,12 +59,3 @@ list <caminho>
 ---------------------
 
 -Lista todos os elementos em ordem alfabética
-
-
----------------------
-DELETE:
-delete <caminho>
----------------------
-
--Apaga um determinado caminho.
--Lembrar de apagar os "dependentes" desse mesmo.
