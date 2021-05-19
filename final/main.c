@@ -5,14 +5,14 @@
 #define MAXINPUT 65524
 #define MAX_COMMAND_SIZE 7
 struct Node{
-    char key[MAXINPUT];
-    char valor[MAXINPUT];
+    char * key;
     struct Node *left;
     struct Node *right;
     int height;
 };
 
 struct Tree{
+    char valor[MAXINPUT];
     char path[MAXINPUT];
     struct Tree *next;
     struct Node *Node;
@@ -47,6 +47,7 @@ struct Node * newNode(char key[]){
     struct Node* node = (struct Node*)malloc(sizeof(struct Node));
 
     ++mallocCounter;
+    node->key = malloc(strlen(key) + 1);
     strcpy(node->key, key);
     node->left   = NULL;
     node->right  = NULL;
@@ -217,6 +218,7 @@ void helpCommand(){
 struct Tree* checkRootTree(struct Tree *root){
     if (root == NULL){
         root = (struct Tree*)malloc(sizeof(struct Tree));
+        if (root == NULL) puts("FUCKED");
         root->next = NULL;
         root->Node = NULL;
     }
@@ -234,7 +236,6 @@ void printing(struct Tree *root){
 struct Tree* nextNull(struct Tree *root){
     struct Tree *temp = root;
     if (root->next == NULL) return root;
-    if (temp->path == NULL) puts("fuck");
     while(temp != NULL){
         if(temp->next == NULL){
             temp->next = checkRootTree(temp->next);
@@ -259,7 +260,7 @@ struct Tree* setCommmand(char path[], char value[], struct Tree *root){
     token = strtok(path, "/");
     if (pathExists(root,path) != NULL){
         temp = pathExists(root,path);
-        strcpy(temp->Node->valor, value);
+        strcpy(temp->valor, value);
         return root;
     }
     temp = nextNull(root);
@@ -272,10 +273,10 @@ struct Tree* setCommmand(char path[], char value[], struct Tree *root){
         temp = pathExists(root, pathHandler);
         if (temp != temp2) val = 0;
         if (temp == NULL) temp = temp2;
-        temp->Node = insert(temp->Node, token);
         if (token2 != NULL){
             temp->Node = insert(temp->Node, token2);
             strcat(pathHandler, "/");
+            strcpy(temp->valor, "\0");
         }
         temp = temp2;
         if (token2 != NULL && val){
@@ -284,7 +285,7 @@ struct Tree* setCommmand(char path[], char value[], struct Tree *root){
         }
         token = token2;
     }
-    strcpy(temp->Node->valor, value);
+    strcpy(temp->valor, value);
     return root;
 }
 
@@ -305,7 +306,7 @@ struct Tree* pathExists(struct Tree *root, char path[]){
 
 void searchCommand(char value[], struct Tree *root){
     while (root != NULL){
-        if (!strcmp(root->Node->valor, value)){
+        if (!strcmp(root->valor, value)){
             puts(root->path);
             break;
         }
@@ -315,9 +316,7 @@ void searchCommand(char value[], struct Tree *root){
 
 void printCommand(struct Tree *root){
     while (root != NULL){
-        if (root->Node->valor != NULL){
-            puts(root->path);
-        }
+        printf("%s %s\n", root->path, root->valor);
         root = root->next;
     }
 }
