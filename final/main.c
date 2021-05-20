@@ -12,8 +12,8 @@ struct Node{
 };
 
 struct Tree{
-    char valor[MAXINPUT];
-    char path[MAXINPUT];
+    char * valor;
+    char * path;
     struct Tree *next;
     struct Node *Node;
 };
@@ -22,6 +22,7 @@ int isCommand(char *input, char *command);
 void helpCommand();
 void quitCommand();
 struct Tree* setCommmand(char path[], char value[], struct Tree *root);
+struct Tree* checkRootTree(struct Tree *root);
 struct Tree* pathExists(struct Tree *root, char path[]);
 void printing(struct Tree *root);
 void searchCommand(char value[], struct Tree *root);
@@ -142,27 +143,12 @@ void finnish(struct Node *root){
     }
 }
 
-/*int main(){
-    struct Node *root = NULL;
-
-    root = insert(root, "um");
-    root = insert(root, "dois");
-    root = insert(root, "quatro");
-    root = insert(root, "cinco");
-    root = insert(root, "tres");   
-    printf("ROOT:\n");
-    preOrder(root);
-    printf("\nOLA:\n");
-
-    printf("\n\n----------------\nmallocCounter: %d\n", mallocCounter);
-    return 0;
-}*/
-
 int main(){
     char command[MAX_COMMAND_SIZE],input[MAXINPUT];
     char path[MAXINPUT], value[MAXINPUT], arguments[MAXINPUT- MAX_COMMAND_SIZE];
     struct Tree *root = NULL;
     while(1) {
+        strcpy(arguments, "\0");
         fgets(input, MAXINPUT, stdin);
         sscanf(input, "%s %[^\n]", command, arguments);
         sscanf(arguments, "%s %[^\n]" ,path, value);
@@ -221,6 +207,7 @@ struct Tree* checkRootTree(struct Tree *root){
         if (root == NULL) puts("FUCKED");
         root->next = NULL;
         root->Node = NULL;
+        root->valor= NULL;
     }
     return root;
 }
@@ -247,6 +234,19 @@ struct Tree* nextNull(struct Tree *root){
     return temp;
 }
 
+struct Tree* setValue(struct Tree *root, char value[]){
+    if (root->valor != NULL) free(root->valor);
+    root->valor = malloc(strlen(value) + 1);
+    strcpy(root->valor, value);
+    return root;
+}
+
+struct Tree* setPath(struct Tree *root, char path[]){
+    if (root->path != NULL) free(root->path);
+    root->path = malloc(strlen(path) + 1);
+    strcpy(root->path, path);
+    return root;
+}
 
 /* set ola/tudobem?/hmmhereitgoes/works!/Ithinkso WORKS!! */
 struct Tree* setCommmand(char path[], char value[], struct Tree *root){
@@ -254,29 +254,35 @@ struct Tree* setCommmand(char path[], char value[], struct Tree *root){
     struct Tree *temp, *temp2;
     int val = 1;
 
-    if(root == NULL) root = checkRootTree(root);
+    if(root == NULL){
+        root = checkRootTree(root);
+        root = setPath(root,pathHandler);
+    }
     temp = root;
-
-    token = strtok(path, "/");
+    
     if (pathExists(root,path) != NULL){
         temp = pathExists(root,path);
-        strcpy(temp->valor, value);
+        temp = setValue(temp, value);
         return root;
     }
+
+    token = strtok(path, "/");
     temp = nextNull(root);
     while( token != NULL ) { 
-        /* TODO- arranjar o nome dos paths e meter isto numa so funçao*/
+        /* TODO- meter isto numa so funçao*/
         token2 = strtok(NULL, "/");
         strcat(pathHandler, token);
-        if(pathExists(root, pathHandler) == NULL)strcpy(temp->path,pathHandler);
+        if(pathExists(root, pathHandler) == NULL) 
+            temp = setPath(temp, pathHandler);
         temp2 = temp;
         temp = pathExists(root, pathHandler);
         if (temp != temp2) val = 0;
         if (temp == NULL) temp = temp2;
+        temp->Node = insert(temp->Node, token);
         if (token2 != NULL){
             temp->Node = insert(temp->Node, token2);
             strcat(pathHandler, "/");
-            strcpy(temp->valor, "\0");
+            temp = setValue(temp, "\0");
         }
         temp = temp2;
         if (token2 != NULL && val){
@@ -285,7 +291,7 @@ struct Tree* setCommmand(char path[], char value[], struct Tree *root){
         }
         token = token2;
     }
-    strcpy(temp->valor, value);
+    temp = setValue(temp, value);
     return root;
 }
 
@@ -296,9 +302,8 @@ se sim, adiciona a esse mesmo*/
 struct Tree* pathExists(struct Tree *root, char path[]){
     struct Tree *temp;
     for (temp = root; temp != NULL; temp = temp->next){
-        if(strcmp(temp->path,path) == 0){
-            return temp;
-        }
+        if (temp->path != NULL)
+            if(strcmp(temp->path,path) == 0)return temp;
     }
     return NULL;
 }
@@ -323,16 +328,18 @@ void printCommand(struct Tree *root){
 
 void listCommand(struct Tree *root, char path[]){
     char *token, pathHandler[MAXINPUT]="/";
-
-    token = strtok(path, "/");
-    while( token != NULL ) {
-        strcat(pathHandler, token);
-        token = strtok(NULL, "/");
-        if (token != NULL) strcat(pathHandler, "/");
+    if (strlen(path) != 0){
+        token = strtok(path, "/");
+        while( token != NULL ) {
+            strcat(pathHandler, token);
+            token = strtok(NULL, "/");
+            if (token != NULL) strcat(pathHandler, "/");
+        }
+        printf("%s woy",path);
+        while (root != NULL){
+            if (!strcmp(root->path, pathHandler)) preOrder(root->Node);
+            root = root->next;
+        }
     }
-
-    while (root != NULL){
-        if (!strcmp(root->path, pathHandler)) preOrder(root->Node);
-        root = root->next;
-    }
+    else preOrder(root->Node);
 }
