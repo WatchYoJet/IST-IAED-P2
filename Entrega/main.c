@@ -276,6 +276,7 @@ char * pathFormatter(char path[]){
     return token;
 }
 
+
 /* set ola/tudobem?/hmmhereitgoes/works!/Ithinkso WORKS!! */
 struct Tree* setCommmand(char path[], char value[], struct Tree *root){
     char *token, pathHandler[MAXINPUT]="/", *token2, *formpath;
@@ -338,6 +339,7 @@ struct Tree* pathExists(struct Tree *root, char path[]){
     }
     return NULL;
 }
+
 
 void searchCommand(char value[], struct Tree *root){
     while (root != NULL){
