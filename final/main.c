@@ -248,25 +248,46 @@ struct Tree* setPath(struct Tree *root, char path[]){
     return root;
 }
 
+char * pathFormatter(char path[]){
+    char *token, *token2, pathHandler[MAXINPUT]="/", jar[MAXINPUT];
+    strcpy(jar, path);
+    token = strtok(jar, "/");
+    while(token != NULL){
+        token2 = strtok(NULL, "/");
+        strcat(pathHandler, token);
+        if (token2 != NULL) strcat(pathHandler, "/");
+        token = token2;
+    }
+    token = malloc(strlen(pathHandler) + 1);
+    return token;
+}
+
+
 /* set ola/tudobem?/hmmhereitgoes/works!/Ithinkso WORKS!! */
 struct Tree* setCommmand(char path[], char value[], struct Tree *root){
-    char *token, pathHandler[MAXINPUT]="/", *token2;
+    char *token, pathHandler[MAXINPUT]="/", *token2, *formpath;
     struct Tree *temp, *temp2;
     int val = 1;
 
+    formpath = pathFormatter(path);
+
+    token = strtok(path, "/");
     if(root == NULL){
         root = checkRootTree(root);
         root = setPath(root,pathHandler);
     }
+    root->Node = insert(root->Node, token);
     temp = root;
     
-    if (pathExists(root,path) != NULL){
-        temp = pathExists(root,path);
+    preOrder(root->Node);
+    puts("");
+
+    if (pathExists(root,formpath) != NULL){
+        temp = pathExists(root,formpath);
         temp = setValue(temp, value);
         return root;
     }
 
-    token = strtok(path, "/");
     temp = nextNull(root);
     while( token != NULL ) { 
         /* TODO- meter isto numa so funçao*/
@@ -335,7 +356,6 @@ void listCommand(struct Tree *root, char path[]){
             token = strtok(NULL, "/");
             if (token != NULL) strcat(pathHandler, "/");
         }
-        printf("%s woy",path);
         while (root != NULL){
             if (!strcmp(root->path, pathHandler)) preOrder(root->Node);
             root = root->next;
