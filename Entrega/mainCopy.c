@@ -14,7 +14,6 @@ struct Node{
 struct Tree{
     char * valor;
     char * path;
-    int deep;
     struct Tree *next;
     struct Node *Node;
 };
@@ -30,95 +29,121 @@ void searchCommand(char value[], struct Tree *root);
 void printCommand(struct Tree *root);
 void listCommand(struct Tree *root, char path[]);
 
-struct Node *  NewNode(char key[], struct Node *  left, struct Node *  right){
-    struct Node *  node = (struct Node * )malloc(sizeof(struct Node * ));
+int mallocCounter = 0;
+
+int max(int a, int b);
+
+int height(struct Node *N){
+    if (N == NULL)
+        return 0;
+    return N->height;
+}
+
+int max(int a, int b){
+    if (a > b) return a;
+    else return b;
+}
+
+struct Node * newNode(char key[]){
+    struct Node* node = (struct Node*)malloc(sizeof(struct Node));
+
+    ++mallocCounter;
     node->key = malloc(strlen(key) + 1);
     strcpy(node->key, key);
-    node->left = left;
-    node->right = right;
-    node->height = 1;
+    node->left   = NULL;
+    node->right  = NULL;
+    node->height = 1;  
+    return(node);
+}
+
+struct Node * rightRotate(struct Node *y){
+    struct Node *x = y->left;
+    struct Node *z = x->right;
+
+    x->right = y;
+    y->left = z;
+    y->height = max(height(y->left), height(y->right))+1;
+    x->height = max(height(x->left), height(x->right))+1;
+
+    return x;
+}
+
+struct Node * leftRotate(struct Node *x){
+    struct Node *y = x->right;
+    struct Node *z = y->left;
+
+    y->left = x;
+    x->right = z;
+    x->height = max(height(x->left), height(x->right))+1;
+    y->height = max(height(y->left), height(y->right))+1;
+
+    return y;
+}
+
+int getBalance(struct Node *N){
+    if (N == NULL) return 0;
+    return height(N->left) - height(N->right);
+}
+
+struct Node * insert(struct Node* node, char key[]){
+
+    if (node == NULL)
+        return(newNode(key));
+
+    if (strcmp(key, node->key) < 0)
+        node->left = insert(node->left, key);
+    else if (strcmp(key, node->key) > 0)
+        node->right = insert(node->right, key);
+    else return node;
+
+    node->height = 1 + max(height(node->left), height(node->right));
+
+    if (getBalance(node) > 1 && strcmp(key, node->left->key) < 0)
+        return rightRotate(node);
+
+    if (getBalance(node) < -1 && strcmp(key, node->right->key) > 0)
+        return leftRotate(node);
+
+    if (getBalance(node) > 1 && strcmp(key, node->left->key) > 0){
+        node->left =  leftRotate(node->left);
+        return rightRotate(node);
+    }
+
+    if (getBalance(node) < -1 && strcmp(key, node->right->key) < 0){
+        node->right = rightRotate(node->right);
+        return leftRotate(node);
+    }
+
     return node;
 }
 
-int height(struct Node *  h){
-    if (h == NULL) return 0;
-    return h->height;
+struct Node * minValueNode(struct Node* node){
+    struct Node* current = node;
+
+    while (current->left != NULL)
+        current = current->left;
+
+    return current;
 }
 
-void NewNodeHeight(struct Node * h){
-    int height_l = height(h->left);
-    int height_r = height(h->right);
-    h->height = height_l > height_r ? height_l + 1 : height_r + 1;
-}
-
-struct Node *  rotL(struct Node *  h){
-    struct Node *  x = h->right;
-    h->right = x->left;
-    x->left = h;
-    NewNodeHeight(h);
-    NewNodeHeight(x);
-    return x;
-}
-
-struct Node *  rotR(struct Node *  h){
-    struct Node *  x = h->left;
-    h->left = x->right;
-    x->right = h;
-    NewNodeHeight(h);
-    NewNodeHeight(x);
-    return x;
-}
-
-struct Node *  rotLR(struct Node *  h){
-    if (h==NULL) return h;
-    h->left = rotL(h->left);
-    return rotR(h);
-}
-struct Node *  rotRL(struct Node *  h){
-    if (h==NULL) return h;
-    h->right = rotR(h->right);
-    return rotL(h);
-}
-int Balance(struct Node *  h) {
-    if(h == NULL) return 0;
-    return height(h->left) - height(h->right);
-}
-
-struct Node *  getbalance(struct Node *  h) {
-    int balanceFactor;
-    if (h==NULL) return h;
-    balanceFactor= Balance(h);
-    if (balanceFactor>1) {
-        if ( Balance(h->left) >= 0 ) h = rotR(h);
-        else h=rotLR(h);
+void preOrder(struct Node *root){
+    if(root != NULL){
+        preOrder(root->left);
+        puts(root->key);
+        preOrder(root->right);
     }
-    else if(balanceFactor<-1){
-        if (Balance(h->right)<=0) h = rotL(h);
-        else h = rotRL(h);
+}
+
+void finnish(struct Node *root){
+    root = root->left;
+    if(root != NULL){
+        free(root);
+        --mallocCounter;
+        finnish(root);
     }
-    else NewNodeHeight(h);
-    return h;
-} 
-
-struct Node *  insert(struct Node *  h, char key[]){
-    if (h == NULL) return NewNode(key, NULL, NULL);
-    if (strcmp(key, h->key) < 0) h->left = insert(h->left, key);
-    else h->right = insert(h->right, key);
-    h = getbalance(h);
-    return h;
 }
 
-struct Node * max(struct Node *  h){
-    for (;h != NULL && h->right != NULL; h = h ->right );
-    return h;
-}
-
-struct Node * minValueNode(struct Node *  h){
-    for (;h != NULL && h->left != NULL; h = h ->left );
-    return h;
-}
-
-struct Node * deleteNode(struct Node * root, char key[]){
+/*struct Node * deleteNode(struct Node * root, char key[]){
     if (root == NULL) return root;
     if (strcmp(key, root->key) < 0) root->left = deleteNode(root->left, key);
     else if( strcmp(key,root->key) > 0) root->right = deleteNode(root->right, key);
@@ -141,29 +166,14 @@ struct Node * deleteNode(struct Node * root, char key[]){
     }
     if (root == NULL) return root;
     else return getbalance(root);
-}
-
-void preOrder(struct Node *  h){
-    if (h == NULL)return;
-    preOrder(h->left);
-    printf("%s ", h->key);
-    preOrder(h->right);
-}
-
-void finnish(struct Node *root){
-    root = root->left;
-    if(root != NULL){
-        free(root);
-        finnish(root);
-    }
-}
+}*/
 
 int main(){
-    char command[MAX_COMMAND_SIZE],input[MAXINPUT];
-    char path[MAXINPUT], value[MAXINPUT], arguments[MAXINPUT- MAX_COMMAND_SIZE];
+    char command[MAX_COMMAND_SIZE]="",input[MAXINPUT]="";
+    char path[MAXINPUT]="", value[MAXINPUT]="", arguments[MAXINPUT- MAX_COMMAND_SIZE]="";
     struct Tree *root = NULL;
-    while(1) {
-        strcpy(arguments, "\0");
+    while(1){
+        strcpy(arguments,"\0");
         fgets(input, MAXINPUT, stdin);
         sscanf(input, "%s %[^\n]", command, arguments);
         sscanf(arguments, "%s %[^\n]" ,path, value);
@@ -222,7 +232,6 @@ struct Tree* checkRootTree(struct Tree *root){
         root->next = NULL;
         root->Node = NULL;
         root->valor= NULL;
-        root->deep = NULL;
     }
     return root;
 }
@@ -256,9 +265,12 @@ struct Tree* setValue(struct Tree *root, char value[]){
 }
 
 struct Tree* setPath(struct Tree *root, char path[]){
-    if (root->path != NULL) free(root->path);
-    root->path = malloc(strlen(path) + 1);
-    strcpy(root->path, path);
+    if (root != NULL){
+        if (root->path != NULL) free(root->path);
+        root->path = malloc(strlen(path) + 1);
+        strcpy(root->path, path);
+        return root;
+    }
     return root;
 }
 
@@ -276,51 +288,68 @@ char * pathFormatter(char path[]){
     return token;
 }
 
+
+
 /* set ola/tudobem?/hmmhereitgoes/works!/Ithinkso WORKS!! */
 struct Tree* setCommmand(char path[], char value[], struct Tree *root){
-    char *token, pathHandler[MAXINPUT]="/", *token2, *formpath;
+    char *token, pathHandler[MAXINPUT]="/", *token2, pote[MAXINPUT]="/";
     struct Tree *temp, *temp2;
-    int val = 1;
-
-    formpath = pathFormatter(path);
-
+    int val = 1, val2 = 1, count=0, val3 = 0;
+    strcpy(pathHandler,path);
+    token = strtok(pathHandler, "/");
+    while(token != NULL){
+        token2 = strtok(NULL, "/");
+        strcat(pote, token);
+        if (token2 != NULL) strcat(pote, "/");
+        token = token2;
+    }
+    strcpy(pathHandler,"/");
     token = strtok(path, "/");
     if(root == NULL){
+        val3 = 1;
         root = checkRootTree(root);
-        root = setPath(root,pathHandler);
+        root = setPath(root,"/");
     }
     root->Node = insert(root->Node, token);
-    temp = root;
-
-    if (pathExists(root,formpath) != NULL){
-        temp = pathExists(root,formpath);
+    if (pathExists(root,pote) != NULL){
+        temp = pathExists(root,pote);
         temp = setValue(temp, value);
         return root;
     }
-
     temp = nextNull(root);
-    while( token != NULL ) { 
+    while( token != NULL ) {
         /* TODO- meter isto numa so funçao*/
         token2 = strtok(NULL, "/");
+        if (count == 0 && val3){
+        temp->next = checkRootTree(temp->next);
+        temp = temp->next;
+        }
         strcat(pathHandler, token);
+        strcpy(pote, pathHandler);
         if(pathExists(root, pathHandler) == NULL) 
             temp = setPath(temp, pathHandler);
         temp2 = temp;
         temp = pathExists(root, pathHandler);
+        strcat(pote, token);
         if (temp != temp2) val = 0;
-        if (temp == NULL) temp = temp2;
-        temp->Node = insert(temp->Node, token);
-        if (token2 != NULL){
+        if (!strcmp(pote, temp->path)) val2 = 0;
+        if (temp != NULL && temp != temp2 && val2)
             temp->Node = insert(temp->Node, token2);
+        if (token2 != NULL){
             strcat(pathHandler, "/");
             temp = setValue(temp, "\0");
         }
         temp = temp2;
-        if (token2 != NULL && val){
+        if ((token2 != NULL && val)){
+            if(token2 != token)
+                temp->Node = insert(temp->Node, token2);
             temp->next = checkRootTree(temp->next);
             temp = temp->next;
         }
         token = token2;
+        val = 1;
+        val2 = 1;
+        ++count;
     }
     temp = setValue(temp, value);
     return root;
@@ -334,12 +363,13 @@ struct Tree* pathExists(struct Tree *root, char path[]){
     struct Tree *temp;
     for (temp = root; temp != NULL; temp = temp->next){
         if (temp->path != NULL)
-            if(strcmp(temp->path,path) == 0)return temp;
+            if(!strcmp(temp->path,path))return temp;
     }
     return NULL;
 }
 
 void searchCommand(char value[], struct Tree *root){
+    root= root->next;
     while (root != NULL){
         if (!strcmp(root->valor, value)){
             puts(root->path);
@@ -350,6 +380,7 @@ void searchCommand(char value[], struct Tree *root){
 }
 
 void printCommand(struct Tree *root){
+    root = root->next;
     while (root != NULL){
         printf("%s %s\n", root->path, root->valor);
         root = root->next;

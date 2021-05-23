@@ -14,7 +14,6 @@ struct Node{
 struct Tree{
     char * valor;
     char * path;
-    int deep;
     struct Tree *next;
     struct Node *Node;
 };
@@ -222,7 +221,6 @@ struct Tree* checkRootTree(struct Tree *root){
         root->next = NULL;
         root->Node = NULL;
         root->valor= NULL;
-        root->deep = NULL;
     }
     return root;
 }
@@ -275,7 +273,6 @@ char * pathFormatter(char path[]){
     token = malloc(strlen(pathHandler) + 1);
     return token;
 }
-
 
 /* set ola/tudobem?/hmmhereitgoes/works!/Ithinkso WORKS!! */
 struct Tree* setCommmand(char path[], char value[], struct Tree *root){
@@ -339,7 +336,6 @@ struct Tree* pathExists(struct Tree *root, char path[]){
     }
     return NULL;
 }
-
 
 void searchCommand(char value[], struct Tree *root){
     while (root != NULL){

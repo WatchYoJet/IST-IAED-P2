@@ -1,20 +1,40 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-struct Node {
-    char * key; 
-    struct Node *  left; 
-    struct Node *  right;
-    int height;    
+/* #include "initReader.h" */
+#define MAXINPUT 65524
+#define MAX_COMMAND_SIZE 7
+struct Node{
+    char * key;
+    struct Node *left;
+    struct Node *right;
+    int height;
 };
 
-struct Node *  NewNode(char key[], struct Node *  left, struct Node *  right){
+struct Tree{
+    char * valor;
+    char * path;
+    struct Tree *next;
+    struct Node *Node;
+};
+
+int isCommand(char *input, char *command);
+void helpCommand();
+void quitCommand();
+struct Tree* setCommmand(char path[], char value[], struct Tree *root);
+struct Tree* checkRootTree(struct Tree *root);
+struct Tree* pathExists(struct Tree *root, char path[]);
+void printing(struct Tree *root);
+void searchCommand(char value[], struct Tree *root);
+void printCommand(struct Tree *root);
+void listCommand(struct Tree *root, char path[]);
+
+struct Node *  NewNode(char key[]){
     struct Node *  node = (struct Node * )malloc(sizeof(struct Node * ));
     node->key = malloc(strlen(key) + 1);
     strcpy(node->key, key);
-    node->left = left;
-    node->right = right;
+    node->left = NULL;                                          
+    node->right = NULL;
     node->height = 1;
     return node;
 }
@@ -80,9 +100,11 @@ struct Node *  getbalance(struct Node *  h) {
 } 
 
 struct Node *  insert(struct Node *  h, char key[]){
-    if (h == NULL) return NewNode(key, NULL, NULL);
+    if (h == NULL) return NewNode(key);
     if (strcmp(key, h->key) < 0) h->left = insert(h->left, key);
-    else h->right = insert(h->right, key);
+    else if (strcmp(key, h->key) > 0)
+        h->right = insert(h->right, key);
+    else return h;
     h = getbalance(h);
     return h;
 }
