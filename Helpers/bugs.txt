@@ -1,6 +1,0 @@
-set ola/colegas
-set ola
-
-colocar o list a dar sem argumentos
-
-list- list de ola/amigos tem ola la dentro (primeiro elemento)
