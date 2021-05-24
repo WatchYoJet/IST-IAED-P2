@@ -24,12 +24,9 @@ void quitCommand();
 struct Tree* setCommmand(char path[], char value[], struct Tree *root);
 struct Tree* checkRootTree(struct Tree *root);
 struct Tree* pathExists(struct Tree *root, char path[]);
-void printing(struct Tree *root);
 void searchCommand(char value[], struct Tree *root);
 void printCommand(struct Tree *root);
 void listCommand(struct Tree *root, char path[]);
-
-int mallocCounter = 0;
 
 int max(int a, int b);
 
@@ -46,8 +43,6 @@ int max(int a, int b){
 
 struct Node * newNode(char key[]){
     struct Node* node = (struct Node*)malloc(sizeof(struct Node));
-
-    ++mallocCounter;
     node->key = malloc(strlen(key) + 1);
     strcpy(node->key, key);
     node->left   = NULL;
@@ -134,20 +129,11 @@ void preOrder(struct Node *root){
     }
 }
 
-void preOrderList(struct Tree *helper, struct Node *root){
-    if(root != NULL){
-        preOrderList(helper, root->left);
-        if(helper->valor != NULL)puts(root->key);
-        preOrderList(helper, root->right);
-    }
-}
-
 
 void finnish(struct Node *root){
     root = root->left;
     if(root != NULL){
         free(root);
-        --mallocCounter;
         finnish(root);
     }
 }
@@ -240,14 +226,6 @@ struct Tree* checkRootTree(struct Tree *root){
         strcpy(root->path, "");
     }
     return root;
-}
-
-
-void printing(struct Tree *root){
-    while (root != NULL){
-        printf("%s\n", root->path);
-        root = root->next;
-    }
 }
 
 struct Tree* nextNull(struct Tree *root){
@@ -393,7 +371,8 @@ void searchCommand(char value[], struct Tree *root){
 void printCommand(struct Tree *root){
     root = root->next;
     while (root != NULL){
-        printf("%s %s\n", root->path, root->valor);
+        if (strcmp(root->valor,""))
+            printf("%s %s\n", root->path, root->valor);
         root = root->next;
     }
 }
@@ -409,9 +388,9 @@ void listCommand(struct Tree *root, char path[]){
         }
         while (root != NULL){
             if (!strcmp(root->path, pathHandler))
-                preOrderList(root, root->Node);
+                preOrder(root->Node);
             root = root->next;
         }
     }
-    else preOrderList(root, root->Node);
+    else preOrder(root->Node);
 }
