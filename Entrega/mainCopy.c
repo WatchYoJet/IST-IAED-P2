@@ -242,6 +242,7 @@ struct Tree* checkRootTree(struct Tree *root){
     return root;
 }
 
+
 void printing(struct Tree *root){
     while (root != NULL){
         printf("%s\n", root->path);
