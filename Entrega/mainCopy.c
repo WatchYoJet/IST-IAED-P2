@@ -27,6 +27,7 @@ struct Tree* pathExists(struct Tree *root, char path[]);
 void searchCommand(char value[], struct Tree *root);
 void printCommand(struct Tree *root);
 void listCommand(struct Tree *root, char path[]);
+void findCommand(struct Tree *root, char path[]);
 
 int max(int a, int b);
 
@@ -177,7 +178,7 @@ int main(){
         if (isCommand(command,"help")) helpCommand();
         else if (isCommand(command,"set"))root = setCommmand(path, value, root); 
         else if (isCommand(command,"print")) printCommand(root);
-        else if (isCommand(command,"find")) printf("hello\n");
+        else if (isCommand(command,"find")) findCommand(root, arguments);
         else if (isCommand(command,"list")) listCommand(root, arguments);
         else if (isCommand(command,"search")) searchCommand(arguments,root);
         else if (isCommand(command,"delete")) printf("hello\n");
@@ -358,7 +359,7 @@ struct Tree* pathExists(struct Tree *root, char path[]){
 }
 
 void searchCommand(char value[], struct Tree *root){
-    root= root->next;
+    root = root->next;
     while (root != NULL){
         if (!strcmp(root->valor, value)){
             puts(root->path);
@@ -393,4 +394,22 @@ void listCommand(struct Tree *root, char path[]){
         }
     }
     else preOrder(root->Node);
+}
+
+void findCommand(struct Tree *root, char path[]){
+    char *token, pathHandler[MAXINPUT]="/";
+    root = root->next;
+    token = strtok(path, "/");
+    while( token != NULL ) {
+        strcat(pathHandler, token);
+        token = strtok(NULL, "/");
+        if (token != NULL) strcat(pathHandler, "/");
+    }
+    while (root != NULL){
+        if (!strcmp(root->path, pathHandler)){
+            puts(root->valor);
+            break;
+        }
+        root = root->next;
+    }
 }
